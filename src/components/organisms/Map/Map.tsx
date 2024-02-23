@@ -22,7 +22,7 @@ export const Map = ({ height = 'calc(100vh - 4rem)', ...props }: IMapProps) => {
       pitch={22.5}
       scrollZoom={false}
       doubleClickZoom={false}
-      initialViewState={{ latitude: 20, longitude: 78, zoom: 4 }}
+      initialViewState={{ latitude: 20, longitude: 78, zoom: 4.5 }}
     >
       <StyleMap />
       {props.children}

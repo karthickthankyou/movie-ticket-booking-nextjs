@@ -59,7 +59,7 @@ export const CinemaInfo = ({
                     {format(showtime.startTime.toString(), 'PP')}
                   </div>
                   <Image
-                    src={showtime.Movie.posterUrl || '/multiplex2.png'}
+                    src={showtime.Movie.posterUrl || '/film.png'}
                     alt=""
                     className="rounded-lg"
                     width={300}

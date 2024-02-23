@@ -1,3 +1,4 @@
+'use client'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
@@ -124,4 +125,14 @@ export const useSearchLocation = () => {
   }, [debouncedSearchText, setLocationInfo])
 
   return { loading, setLoading, searchText, setSearchText, locationInfo }
+}
+
+export const useKeypress = (keys: string[], action?: Function) => {
+  useEffect(() => {
+    const onKeyup = (e: { key: any }) => {
+      if (keys.includes(e.key) && action) action()
+    }
+    window.addEventListener('keyup', onKeyup)
+    return () => window.removeEventListener('keyup', onKeyup)
+  }, [action, keys])
 }
