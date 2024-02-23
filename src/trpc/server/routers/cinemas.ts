@@ -51,4 +51,31 @@ export const cinemasRoutes = createTRPCRouter({
         },
       })
     }),
+  myCinemas: protectedProcedure()
+    .input(findManyCinemaArgsSchema.omit({ addressWhere: true }))
+    .query(({ ctx, input }) => {
+      return ctx.db.cinema.findMany({
+        ...input,
+        where: {
+          ...input.where,
+          Managers: { some: { id: ctx.session.userId } },
+        },
+        include: {
+          Screens: { include: { Showtimes: { include: { Movie: true } } } },
+        },
+      })
+    }),
+
+  myScreens: protectedProcedure().query(({ ctx }) => {
+    return ctx.db.screen.findMany({
+      where: {
+        Cinema: {
+          Managers: { some: { id: ctx.session.userId } },
+        },
+      },
+      include: {
+        Cinema: true,
+      },
+    })
+  }),
 })
