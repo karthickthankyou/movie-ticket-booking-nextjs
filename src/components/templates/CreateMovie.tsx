@@ -11,6 +11,10 @@ import { HtmlSelect } from '../atoms/select'
 import { Button } from '../atoms/button'
 import { useRouter } from 'next/navigation'
 import { revalidatePath } from '@/util/actions/revalidatePath'
+import { ImagePreview } from '../molecules/ImagePreview'
+import { useImageUpload } from '@/util/hooks'
+import { Controller } from 'react-hook-form'
+import { ProgressBar } from '../molecules/ProgressBar'
 
 export interface ICreateMovieProps {}
 
@@ -20,25 +24,34 @@ export const CreateMovie = ({}: ICreateMovieProps) => {
     handleSubmit,
     reset,
     formState: { errors },
+    watch,
+    resetField,
+    control,
   } = useFormCreateMovie()
 
   const { isLoading, mutateAsync: createMovie } =
     trpcClient.movies.createMovie.useMutation()
+  const { posterUrl } = watch()
 
   const { toast } = useToast()
   const { replace } = useRouter()
+
+  const [{ percent, uploading }, uploadImages] = useImageUpload()
 
   return (
     <div>
       <form
         onSubmit={handleSubmit(
           async ({ director, duration, genre, releaseDate, title }) => {
+            const uploadedImages = await uploadImages(posterUrl)
+
             await createMovie({
               director,
               duration,
               genre,
               releaseDate,
               title,
+              posterUrl: uploadedImages[0],
             })
             reset()
             toast({ title: 'Movie created successfully.' })
@@ -83,8 +96,29 @@ export const CreateMovie = ({}: ICreateMovieProps) => {
               </HtmlSelect>
             </Label>
           </div>
+          <Label title="Images" error={errors.posterUrl?.message?.toString()}>
+            <ImagePreview
+              src={posterUrl || ''}
+              clearImage={() => resetField('posterUrl')}
+            >
+              <Controller
+                control={control}
+                name={`posterUrl`}
+                render={({ field }) => (
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple={false}
+                    onChange={(e) => field.onChange(e?.target?.files)}
+                  />
+                )}
+              />
+            </ImagePreview>
+
+            {percent > 0 ? <ProgressBar value={percent} /> : null}
+          </Label>
         </div>
-        <Button loading={isLoading} type="submit">
+        <Button loading={isLoading || uploading} type="submit">
           Submit
         </Button>
       </form>
