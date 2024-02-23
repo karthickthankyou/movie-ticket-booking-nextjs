@@ -6,6 +6,7 @@ import { useMap } from 'react-map-gl'
 import { SimpleDialog } from '../SimpleDialog'
 import { SelectMovie } from './SelectMovie'
 import { SelectShowtimes } from './SelectShows'
+import { SelectSeats } from './SelectSeats'
 
 export const MovieDialog = () => {
   const { params, deleteAll } = useHandleSearch()
@@ -54,6 +55,10 @@ export const MovieDialog = () => {
             movieId={+movieId}
             showtimeId={showtimeId ? +showtimeId : null}
           />
+        ) : null}
+
+        {screenId && showtimeId ? (
+          <SelectSeats showtimeId={+showtimeId} screenId={+screenId} />
         ) : null}
       </div>
     </SimpleDialog>

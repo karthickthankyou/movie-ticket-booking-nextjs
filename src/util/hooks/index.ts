@@ -1,10 +1,11 @@
 'use client'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { storage } from '../config/firebase'
 import { catchError, debounceTime, EMPTY, Subject, tap } from 'rxjs'
 import { trpcClient } from '@/trpc/clients/client'
+import { RouterOutputs } from '@/trpc/clients/types'
 
 export const useDialogState = (defaultState = false) => {
   const [open, setOpen] = useState(defaultState)
@@ -182,4 +183,69 @@ export function useGetCinema({ cinemaId }: { cinemaId: string | null }) {
   console.log('data ', data)
 
   return { cinema: data }
+}
+
+type SeatRowcolumn = RouterOutputs['showtimes']['seats']['seats'][0]
+
+type State = {
+  selectedSeats: SeatRowcolumn[]
+}
+
+type ToggleAction = {
+  type: 'toggleSeat'
+  payload: SeatRowcolumn
+}
+type ResetAction = {
+  type: 'reset'
+}
+type Action = ToggleAction | ResetAction
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'toggleSeat': {
+      const existingSelection = state.selectedSeats.find(
+        (selectedSeat) =>
+          action.payload?.column === selectedSeat.column &&
+          action.payload?.row === selectedSeat.row,
+      )
+
+      if (existingSelection) {
+        return {
+          ...state,
+          selectedSeats: state.selectedSeats.filter(
+            (seat) =>
+              !(
+                seat.column === action.payload.column &&
+                seat.row === action.payload.row
+              ),
+          ),
+        }
+      } else {
+        return {
+          ...state,
+          selectedSeats: [...state.selectedSeats, action.payload],
+        }
+      }
+    }
+    case 'reset': {
+      return {
+        ...state,
+        selectedSeats: [],
+      }
+    }
+    default:
+      return state
+  }
+}
+
+export const useSeatSelection = () => {
+  const [state, dispatch] = useReducer(reducer, { selectedSeats: [] })
+
+  const toggleSeat = (seat: SeatRowcolumn) => {
+    dispatch({ type: 'toggleSeat', payload: seat })
+  }
+  const resetSeats = () => {
+    dispatch({ type: 'reset' })
+  }
+  return { state, toggleSeat, resetSeats }
 }

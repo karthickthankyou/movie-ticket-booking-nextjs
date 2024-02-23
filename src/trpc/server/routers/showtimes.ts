@@ -4,6 +4,42 @@ import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
 export const showtimesRoutes = createTRPCRouter({
+  seats: publicProcedure
+    .input(z.object({ showtimeId: z.number() }))
+    .query(async ({ ctx, input: { showtimeId } }) => {
+      const showtime = await ctx.db.showtime.findUnique({
+        where: { id: showtimeId },
+        include: { Screen: { include: { Seats: true } } },
+      })
+
+      // Add booked information to each seat
+      const seatsWithBookingInfo = await Promise.all(
+        showtime?.Screen.Seats.map(async (seat) => {
+          const booking = await ctx.db.booking.findUnique({
+            where: {
+              uniqueSeatShowtime: {
+                column: seat.column,
+                row: seat.row,
+                screenId: seat.screenId,
+                showtimeId,
+              },
+            },
+          })
+
+          return {
+            ...seat,
+            booked: booking?.id ? true : false,
+          }
+        }) || [],
+      )
+
+      const ticketPrice = await ctx.db.showtime.findUnique({
+        where: { id: showtimeId },
+        include: { Screen: true },
+      })
+
+      return { seats: seatsWithBookingInfo, price: ticketPrice?.Screen.price }
+    }),
   seatsInfo: publicProcedure
     .input(z.object({ showtimeId: z.number() }))
     .query(async ({ ctx, input }) => {
