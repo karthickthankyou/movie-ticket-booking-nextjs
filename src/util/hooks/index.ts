@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { storage } from '../config/firebase'
 import { catchError, debounceTime, EMPTY, Subject, tap } from 'rxjs'
+import { trpcClient } from '@/trpc/clients/client'
 
 export const useDialogState = (defaultState = false) => {
   const [open, setOpen] = useState(defaultState)
@@ -160,4 +161,25 @@ export const useHandleSearch = () => {
   }
 
   return { params, addParam, deleteParam, deleteAll }
+}
+
+/**
+ * Get current cinema
+ */
+
+export function useGetCinema({ cinemaId }: { cinemaId: string | null }) {
+  const { data, refetch } = trpcClient.cinemas.cinema.useQuery(
+    { cinemaId: +(cinemaId || '') },
+    { enabled: false },
+  )
+
+  useEffect(() => {
+    if (cinemaId) {
+      refetch()
+    }
+  }, [refetch, cinemaId])
+
+  console.log('data ', data)
+
+  return { cinema: data }
 }

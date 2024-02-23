@@ -32,6 +32,17 @@ export const cinemasRoutes = createTRPCRouter({
         },
       })
     }),
+  cinema: publicProcedure
+    .input(z.object({ cinemaId: z.number().nullable() }))
+    .query(({ ctx, input: { cinemaId } }) => {
+      if (!cinemaId) {
+        return null
+      }
+      return ctx.db.cinema.findUnique({
+        where: { id: cinemaId },
+        include: { Address: true },
+      })
+    }),
   cinemas: protectedProcedure()
     .input(findManyCinemaArgsSchema.omit({ addressWhere: true }))
     .query(({ ctx, input }) => {
