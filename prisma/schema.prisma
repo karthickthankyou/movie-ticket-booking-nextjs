@@ -23,6 +23,9 @@ model User {
 
     Admin   Admin?
     Manager Manager?
+
+    Bookings Booking[]
+    Tickets  Ticket[]
 }
 
 model Admin {
@@ -39,5 +42,165 @@ model Manager {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    User User @relation(fields: [id], references: [id])
+    User     User    @relation(fields: [id], references: [id])
+    Cinema   Cinema? @relation(fields: [cinemaId], references: [id])
+    cinemaId Int?
+}
+
+model Cinema {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String
+    Screens   Screen[]
+    Address   Address?
+
+    Managers Manager[]
+}
+
+model Address {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    cinemaId  Int      @unique
+    Cinema    Cinema   @relation(fields: [cinemaId], references: [id])
+    address   String
+    lat       Float
+    lng       Float
+}
+
+model Screen {
+    id              Int             @id @default(autoincrement())
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
+    number          Int
+    cinemaId        Int
+    Cinema          Cinema          @relation(fields: [cinemaId], references: [id])
+    Seats           Seat[]
+    Showtimes       Showtime[]
+    projectionType  ProjectionType  @default(STANDARD)
+    soundSystemType SoundSystemType @default(DOLBY_ATMOS)
+
+    price Float @default(180)
+
+    @@unique([cinemaId, number])
+}
+
+model Seat {
+    row      Int
+    column   Int
+    screenId Int
+    Screen   Screen    @relation(fields: [screenId], references: [id])
+    Bookings Booking[]
+
+    @@id([screenId, row, column])
+}
+
+model Movie {
+    id          Int        @id @default(autoincrement())
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
+    title       String
+    director    String
+    genre       Genre
+    duration    Int // Duration in minutes
+    releaseDate DateTime
+    posterUrl   String?
+    Showtimes   Showtime[]
+}
+
+model Showtime {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    startTime DateTime
+    movieId   Int
+    Movie     Movie     @relation(fields: [movieId], references: [id])
+    screenId  Int
+    Screen    Screen    @relation(fields: [screenId], references: [id])
+    Bookings  Booking[]
+
+    status ShowtimeStatus?
+
+    @@unique([startTime, screenId])
+}
+
+model Booking {
+    id         Int      @id @default(autoincrement())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    userId     String
+    User       User     @relation(fields: [userId], references: [id])
+    showtimeId Int
+    Showtime   Showtime @relation(fields: [showtimeId], references: [id])
+    row        Int
+    column     Int
+    screenId   Int
+    Seat       Seat     @relation(fields: [screenId, row, column], references: [screenId, row, column])
+    Ticket     Ticket   @relation(fields: [ticketId], references: [id])
+    ticketId   Int
+
+    @@unique([screenId, row, column, showtimeId], name: "uniqueSeatShowtime")
+    @@index([screenId, row, column], name: "seatIndex")
+}
+
+model Ticket {
+    id   Int    @id @default(autoincrement())
+    uid  String
+    User User   @relation(fields: [uid], references: [id])
+
+    qrCode String?
+
+    Bookings Booking[]
+}
+
+enum ProjectionType {
+    STANDARD
+    IMAX
+    DOLBY_CINEMA
+    RPX
+    SCREENX
+    PLF // Premium Large Format
+}
+
+enum SoundSystemType {
+    MONO
+    STEREO
+    DOLBY_DIGITAL
+    DOLBY_ATMOS
+    DTS
+    DTS_X
+    SONY_SDDS
+    AURO_3D
+    IMAX_ENHANCED
+}
+
+enum Genre {
+    ACTION
+    ADVENTURE
+    ANIMATION
+    COMEDY
+    CRIME
+    DOCUMENTARY
+    DRAMA
+    FAMILY
+    FANTASY
+    FILM_NOIR
+    HISTORY
+    HORROR
+    MUSIC
+    MYSTERY
+    ROMANCE
+    SCI_FI
+    SHORT
+    SPORT
+    THRILLER
+    WAR
+    WESTERN
+}
+
+enum ShowtimeStatus {
+    POSTPONED
+    CANCELLED
 }

@@ -1,22 +1,26 @@
 'use client'
-import { UserInfo } from '@/components/UserInfo'
 import { trpcClient } from '@/trpc/clients/client'
-import { UserButton, auth, useAuth } from '@clerk/nextjs'
+import { UserButton, useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
 
 export default function Home() {
   const { userId } = useAuth()
 
-  const { data, isLoading } = trpcClient.allUsers.useQuery()
+  const { data, isLoading } = trpcClient.movies.movies.useQuery()
 
   console.log('data', data, isLoading)
 
   return (
     <main>
-      Hello world
       {userId ? <UserButton /> : <Link href="/sign-in">Sign in</Link>}
       <div className="mt-8">
-        {data?.map((user) => <UserInfo key={user.id} user={user} />)}{' '}
+        {data?.map((movie) => (
+          <div key={movie.id}>
+            <div>{movie.id}</div>
+            <div>{movie.title}</div>
+            <div>{movie.director}</div>
+          </div>
+        ))}{' '}
       </div>
     </main>
   )
