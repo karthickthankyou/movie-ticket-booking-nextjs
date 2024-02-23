@@ -1,4 +1,3 @@
-import { RouterOutputs } from '@/trpc/clients/types'
 import { BaseComponent } from '@/util/types'
 import Image from 'next/image'
 

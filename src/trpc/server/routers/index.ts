@@ -5,6 +5,7 @@ import { managersRoutes } from './managers'
 import { moviesRoutes } from './movies'
 import { showtimesRoutes } from './showtimes'
 import { stripeRoutes } from './stripe'
+import { ticketsRoutes } from './tickets'
 
 export const appRouter = createTRPCRouter({
   movies: moviesRoutes,
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
   showtimes: showtimesRoutes,
   managers: managersRoutes,
   stripe: stripeRoutes,
+  tickets: ticketsRoutes,
 })
 
 export type AppRouter = typeof appRouter
