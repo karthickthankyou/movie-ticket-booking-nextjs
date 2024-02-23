@@ -1,0 +1,36 @@
+.leaflet-popup-content-wrapper {
+  @apply p-0 rounded-t-none shadow-none bg-transparent rounded-b-lg !important;
+}
+
+.leaflet-popup-content {
+  @apply m-0 !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  @apply text-black hover:bg-black/10 !important;
+}
+
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+  @apply border-0 !important;
+}
+
+.leaflet-bar a {
+  @apply bg-white/40 hover:bg-white backdrop-blur-sm rounded-none !important;
+}
+
+.leaflet-control {
+  z-index: 0 !important;
+}
+.leaflet-pane {
+  z-index: 0 !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  @apply shadow-none;
+}
+
+.mapboxgl-popup-content {
+  @apply shadow-lg p-0 rounded-xl overflow-hidden bg-white/20 backdrop-blur-sm border-x border-t border-white !important;
+}

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
+
 import { ClerkProvider } from '@clerk/nextjs'
 import { TRPCReactProvider } from '@/trpc/clients/client'
 import { Toaster } from '@/components/molecules/Toaster/toaster'
