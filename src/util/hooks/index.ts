@@ -1,5 +1,5 @@
 'use client'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { storage } from '../config/firebase'
@@ -135,4 +135,29 @@ export const useKeypress = (keys: string[], action?: Function) => {
     window.addEventListener('keyup', onKeyup)
     return () => window.removeEventListener('keyup', onKeyup)
   }, [action, keys])
+}
+
+export const useHandleSearch = () => {
+  const searchParams = useSearchParams()
+  const params = new URLSearchParams(searchParams)
+  const pathname = usePathname()
+  const router = useRouter()
+
+  const addParam = (key: string, value: string | number) => {
+    params.set(key, value.toString())
+    router.replace(`${pathname}?${params}`)
+  }
+
+  const deleteParam = (key: string) => {
+    params.delete(key)
+    console.log('delete:params', params.toString())
+  }
+
+  const deleteAll = () => {
+    router.replace('/cinemas')
+
+    console.log('deleteAll:params', params.toString())
+  }
+
+  return { params, addParam, deleteParam, deleteAll }
 }

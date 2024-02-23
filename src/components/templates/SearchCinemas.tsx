@@ -1,5 +1,5 @@
 'use client'
-import { SetCity } from '../organisms/HomeUtils'
+import { DisplayCinemas, SetCity } from '../organisms/SearchUtils'
 import { Map } from '../organisms/Map'
 import { Panel } from '../organisms/Map/Panel'
 import { DefaultZoomControls } from '../organisms/Map/ZoomControls'
@@ -12,6 +12,8 @@ export const SearchCinemas = ({}: ISearchCinemasProps) => {
       <Panel position="right-center">
         <DefaultZoomControls />
       </Panel>
+
+      <DisplayCinemas />
 
       <Panel position="left-top">
         <SetCity />
