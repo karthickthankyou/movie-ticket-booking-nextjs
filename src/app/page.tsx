@@ -12,7 +12,6 @@ export default function Home() {
 
   return (
     <main>
-      {userId ? <UserButton /> : <Link href="/sign-in">Sign in</Link>}
       <div className="mt-8">
         {data?.map((movie) => (
           <div key={movie.id}>

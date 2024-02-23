@@ -1,11 +1,10 @@
-import { createTRPCRouter, publicProcedure } from '..'
+import { createTRPCRouter } from '..'
+import { adminsRoutes } from './admins'
 import { moviesRoutes } from './movies'
 
 export const appRouter = createTRPCRouter({
-  allUsers: publicProcedure.query(({ ctx }) => {
-    return ctx.db.user.findMany()
-  }),
   movies: moviesRoutes,
+  admins: adminsRoutes,
 })
 
 export type AppRouter = typeof appRouter
